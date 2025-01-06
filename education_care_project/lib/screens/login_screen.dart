@@ -1,3 +1,6 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:education_care_project/broadcastreceiver/connectivity_listener.dart';
+//import 'package:education_care_project/screens/register_withoutlocation.dart';
 import 'package:flutter/material.dart';
 import '../services/api_service.dart'; // ApiService burada kullanılıyor
 import 'home_screen.dart'; // Giriş başarılı olursa yönlendirilecek ekran
@@ -41,7 +44,9 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => HomeScreen()),
+        MaterialPageRoute(builder: (context) => ConnectivityListener(
+            child: HomeScreen())
+        ),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -52,6 +57,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+
+    Future<bool> _isConnectedToWifi() async {
+      var connectivityResult = await (Connectivity().checkConnectivity());
+      return connectivityResult == ConnectivityResult.wifi;
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Giriş Yap'),
@@ -96,7 +107,19 @@ class _LoginScreenState extends State<LoginScreen> {
                 _isLoading
                     ? CircularProgressIndicator()
                     : ElevatedButton(
-                  onPressed: _handleLogin,
+                  onPressed:() async {
+                     bool isWifi = await _isConnectedToWifi();
+                     if(isWifi){
+                       _handleLogin();
+                     }else {
+                       ScaffoldMessenger.of(context).showSnackBar(
+                         SnackBar(
+                           content: Text('Wi-Fi bağlantınız yok. Eğitim Uygulaması\'na erişmek için Wi-Fi\'ye bağlanın.'),
+                           duration: Duration(seconds: 3),
+                         ),
+                       );
+                     }
+                  } ,
                   child: Text('Giriş'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.teal,
@@ -116,7 +139,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => RegisterScreen()),
+                      MaterialPageRoute(builder: (context) => ConnectivityListener(
+                          child: RegisterScreen())
+                      ),
                     );
                   },
                   child: Text('Hesabınız yok mu? Kayıt olun'),

@@ -1,7 +1,4 @@
-import 'package:education_care_project/providers/database_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:permission_handler/permission_handler.dart';
 import '../services/api_service.dart'; // ApiService'i kullanıyoruz
 
 class RegisterScreen extends StatefulWidget {
@@ -14,7 +11,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
 
-
   Future<void> _handleRegister() async {
     final String username = _usernameController.text.trim();
     final String password = _passwordController.text.trim();
@@ -25,7 +21,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
       return;
     }
-
 
     setState(() {
       _isLoading = true;
@@ -39,34 +34,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
 
     if (success) {
-
-      // Kullanıcıyı veritabanına ekle
-      final userId = await DatabaseHelper.instance.insertUser(username);
-
-      // Konum izni al ve konumu kaydet
-      final LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied ||
-          permission == LocationPermission.deniedForever) {
-        final newPermission = await Geolocator.requestPermission();
-        if (newPermission == LocationPermission.denied ||
-            newPermission == LocationPermission.deniedForever) {
-          throw Exception('Konum izni verilmedi.');
-        }
-      }
-
-      // Konum al
-      final position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
-
-      // Konumu veritabanına ekle
-      await DatabaseHelper.instance.insertUserLocation(
-        userId,
-        position.latitude,
-        position.longitude,
-      );
-
-      await DatabaseHelper.instance.printAllUsersAndLocations();
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Kayıt başarılı! Giriş yapabilirsiniz.')),
       );
