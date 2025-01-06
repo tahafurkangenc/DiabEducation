@@ -1,6 +1,9 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:education_care_project/screens/education_market.dart';
 import 'package:flutter/material.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'diabetes_education_screen.dart';
+import 'dart:convert'; // Türkçe karakter desteği için
 class EducationScreen extends StatefulWidget {
   @override
   State<EducationScreen> createState() => _EducationScreenState();
@@ -26,6 +29,11 @@ class _EducationScreenState extends State<EducationScreen> {
         mute: false,
       ),
     )).toList();
+  }
+
+  Future<bool> _isConnectedToWifi() async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    return connectivityResult == ConnectivityResult.wifi;
   }
 
   @override
@@ -86,11 +94,12 @@ class _EducationScreenState extends State<EducationScreen> {
             Expanded(
               child: ListView(
                 children: [
-                  _buildMenuButton('Diyabet', Icons.health_and_safety),
-                  _buildMenuButton('Diyabette Beslenme', Icons.fastfood),
-                  _buildMenuButton('Diyabette Egzersiz', Icons.directions_run),
-                  _buildMenuButton('Diyabette Öz Bakım', Icons.spa),
-                  _buildMenuButton('Diyabette İlaç Kullanımı', Icons.medical_services),
+                  _buildMenuButton('Diyabet Eğitimi', Icons.health_and_safety ,Colors.teal as Color),
+                  _buildMenuButton('Diyabette Beslenme', Icons.fastfood,Colors.teal as Color),
+                  _buildMenuButton('Egzersiz', Icons.directions_run,Colors.teal as Color),
+                  _buildMenuButton('Öz Bakım', Icons.spa,Colors.teal as Color),
+                  _buildMenuButton('İlaç Kullanımı', Icons.medical_services,Colors.teal as Color),
+                  _buildMenuButton("Eğitim Mağazası", Icons.shopping_bag_outlined, Colors.deepPurple as Color)
                 ],
               ),
             ),
@@ -100,42 +109,64 @@ class _EducationScreenState extends State<EducationScreen> {
     );
   }
 
-  Widget _buildMenuButton(String text, IconData icon) {
+  Widget _buildMenuButton(String text, IconData icon, Color buttoncolor) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: ElevatedButton.icon(
-        onPressed: () {
-          if (text=="Diyabet"){
+      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
+      child: ElevatedButton(
+        onPressed: () async {
+          if (text == "Eğitim Mağazası"){
+            bool isWifi = await _isConnectedToWifi();
+            if (isWifi) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => EducationMarket()),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Wi-Fi bağlantınız yok. Eğitim Mağazası\'na erişmek için Wi-Fi\'ye bağlanın.'),
+                  duration: Duration(seconds: 3),
+                ),
+              );
+            }
+          }else{
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => DiabetesEducationScreen()),
+              MaterialPageRoute(
+                builder: (context) => DiabetesEducationScreen(category: text),
+              ),
             );
           }
-          if (text=="Diyabette Beslenme"){
-            //Diyabette Beslenme
-          }
-          if (text=="Diyabette Egzersiz"){
-            //Diyabette Egzersiz
-          }
-          if (text=="Diyabette Öz Bakım"){
-            //Diyabette Öz Bakım
-          }
-          if (text=="Diyabette İlaç Kullanımı"){
-            //Diyabette İlaç Kullanımı
-          }
         },
-        icon: Icon(icon, color: Colors.white),
-        label: Text(
-          text,
-          style: TextStyle(fontSize: 16),
-        ),
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.teal, // Buton rengi
+          backgroundColor: buttoncolor as Color, // Buton rengi
+          minimumSize: Size(150, 50), // Butonun genişlik ve yükseklik ayarı
+          padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0), // İç kenar boşlukları
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(16), // Köşe yuvarlaklığı
           ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween, // İkon ve yazıyı karşıt kenarlara iter
+          children: [
+            // Yazı sola
+            Text(
+              text,
+              style: TextStyle(
+                fontSize: 20, // Yazı boyutunu büyüt
+                color: Colors.white, // Yazı rengini beyaz yap
+              ),
+            ),
+            // İkon sağa
+            Icon(
+              icon,
+              color: Colors.white,
+              size: 40, // İkon boyutu
+            ),
+          ],
         ),
       ),
     );
+
   }
 }
