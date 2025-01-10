@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+<head>
+    <title>Model Karşılaştırma Arayüzü</title>
+     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+     <style>
+       body {
+             font-family: Arial, sans-serif;
+              margin: 50px;
+        }
+        
+       h1 {
+           color: #333;
+       }
+       
+       textarea {
+           width: 100%;
+           font-size: 16px;
+       }
+       
+       input[type="submit"] {
+           padding: 10px 20px;
+           font-size: 16px;
+       }
+       
+       label {
+           font-weight: bold;
+       }
+       
+       .response {
+           background-color: #f4f4f4;
+           padding: 20px;
+           margin-top: 20px;
+       }
+     </style>
+</head>
+<body>
+    <h1>Prompt Girin ve Model Seçin</h1>
+    <form method="post">
+        <textarea name="prompt" rows="4" cols="50">{{ prompt }}</textarea><br><br>
+        <label>Model Seçimi:</label><br>
+        <input type="radio" id="ollama" name="model" value="ollama" {% if selected_model == 'ollama' %}checked{% endif %}>
+        <label for="ollama">Ollama</label><br>
+        <input type="radio" id="gemini" name="model" value="gemini" {% if selected_model == 'gemini' %}checked{% endif %}>
+        <label for="gemini">Gemini</label><br><br>
+        <input type="submit" value="Ara">
+    </form>
+
+    {% if response %}
+        <h2>Sonuç:</h2>
+        <p>{{ response }}</p>
+    {% endif %}
+</body>
+</html>
