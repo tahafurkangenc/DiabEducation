@@ -47,7 +47,7 @@ Ardından şu komutu çalıştırınız.
 - Windows için: .venv\Scripts\activate
 
 #### Adım #2: Gerekli Paketlerin Kurulması
-Aşağıdaki komutu ***** çalıştırınız.
+Aşağıdaki komutu "gemini api try" klasörü içerisinde çalıştırınız.
 - pip install -r requirements.txt
 
 #### Adım #3: FastAPI Çalıştırılması
